@@ -1,5 +1,3 @@
-package com.example.tictactoeaiplayer;
-
 public class Board{
     private char[][] board;
     private int movesMade;
@@ -9,7 +7,13 @@ public class Board{
         movesMade = 0;
     }
 
-    public String makeMove(int row, int col, char playerSymbol){
+
+    public Board(char[][] board, int movesMade){
+        this.board = board;
+        this.movesMade = movesMade;
+    }
+
+    public int makeMove(int row, int col, char playerSymbol){
         if (isValidMove(row, col)){
             board[row][col] = playerSymbol;
             movesMade++;
@@ -18,19 +22,27 @@ public class Board{
         }
         else{
             printBoard();
-            return "Invalid move";
+            return -2;
         }
 
     }
 
-    public String hasConcluded(int row, int col, char playerSymbol){
-        if (isDraw()) return "Its a Draw";
+    public int hasConcluded(int row, int col, char playerSymbol){
+        if (isDraw()) return 0;
         else if (rowMatch(row, playerSymbol) || colMatch(col, playerSymbol) || diagonalMatch(playerSymbol)) {
-            return playerSymbol + " won the match";
+            return 1;
         }
-        else return "pending";
+        else return -1;
     }
 
+    public char[][] getBoard(){
+        return board;
+    }
+
+    public int getMovesMade(){return movesMade;}
+    public int getLength(){
+        return board.length;
+    }
 
     private boolean isValidMove(int row, int col){
         if (row >= board.length || col >= board.length) return false;

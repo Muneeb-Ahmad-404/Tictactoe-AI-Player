@@ -1,0 +1,19 @@
+hash_array  (to keep track of all the possible moves and the scores). stores(human move and the best scenario for ai-draw or wins with index
+of the move).
+
+
+Ai_moves function
+if reached an end:
+    things needed to store are current score, previous setting(for each ai move store the prev human move) and index of placement.
+    in a hashmap.
+put ai symbol on ith available position
+ask human to put on the all available positions one by one
+
+
+
+
+
+
+human_moves function
+put human symbol on ith available position.
+ask ai to put ai symbol in all the available positions one by one

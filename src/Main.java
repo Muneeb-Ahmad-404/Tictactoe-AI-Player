@@ -1,4 +1,3 @@
-package com.example.tictactoeaiplayer;
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
@@ -30,6 +29,7 @@ public class Main {
             System.out.print("Enter the column: ");
             int col = scan.nextInt();
             result = board.makeMove(row - 1, col - 1, playerSymbol);
+            System.out.println(turn);
             if (result == "Invalid move"){
                 System.out.println(result);
                 result = "pending";
