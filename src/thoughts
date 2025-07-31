@@ -1,19 +1,30 @@
-hash_array  (to keep track of all the possible moves and the scores). stores(human move and the best scenario for ai-draw or wins with index
-of the move).
+AI gets a board to make move, it can be empty or with a move form computer or some moves from itself too.
+it needs to check all the empty places and put its symbol there one by one
+for each placement of symbol assume some random move by the human player which could be made by the human.
+now for each possible human move make possible ai moves and so on.
+unless you face the base case where either human or the ai won or it was a draw.
 
 
-Ai_moves function
-if reached an end:
-    things needed to store are current score, previous setting(for each ai move store the prev human move) and index of placement.
-    in a hashmap.
-put ai symbol on ith available position
-ask human to put on the all available positions one by one
+AI(board):
+    for each '-' place:
+        makemove(i, j)
+
+makemove(board, i, j):
+   i, j___'-' place is now ai_symbol
+   does i, j move concluded anything? is the new score greater?
+        and human move().
+
+
+human(board)
+    for each '-' place:
+        '-' place is now human_symbol
+        has concluded? human won?
+        and ai_move(board).
 
 
 
-
-
-
-human_moves function
-put human symbol on ith available position.
-ask ai to put ai symbol in all the available positions one by one
+ How the curr code is working??  31-7-2025
+ Now when we run our code.
+ the bode goes to ai-player it checks if the hash has the answer if not it moves to the ai move method
+ at ai move method clone another board to avoid conflict.
+ check for first empty place

@@ -1,67 +1,90 @@
 import java.util.HashMap;
-
-public class AIPlayer  extends Player {
-    private HashMap<String, int[]> situations;
+public class AIPlayer extends Player {
+    private HashMap<String, int[]> map;  //int of the form row, col, score
+    private char humanSymbol;
 
     public AIPlayer(char symbol) {
         super(symbol);
-    }
-
-    @Override
-    public int[] getMove(Board board) {
-        char[][] b = board.getBoard();
-        if(situations.containsKey(b.toString())) {
-            return situations.get(b.toString());
+        if(symbol == 'O'){
+            humanSymbol = 'X';
         }
         else{
-            return aiMove(board, 0, 0, -5);
+            humanSymbol = 'O';
+        }
+        map = new HashMap<String, int[]>();
+    }
+    public int[] getMove(Board board) {
+        if(map.containsKey(board.toString())) {
+            System.out.println("contains");
+            return map.get(board.toString());
+        }
+        else{
+            aiMoves(board.clone());
+            return map.get(board.toString());
         }
     }
-
-    private int[] aiMove(Board board, int row, int col, int score){
-        if(reachedEnd(board, row, col) == 1){
-            if(situations.containsKey(board.getBoard().toString())){
-                if(score > situations.get(board.getBoard().toString())[2]){
-                    situations.put(board.getBoard().toString(), new int[]{row, col, score});
-                }
-            }
-            return new int[]{row, col, score};
-        }
-        else if(reachedEnd(board, row, col) == 0){
-            if(situations.containsKey(board.getBoard().toString())){
-                if(score > situations.get(board.getBoard().toString())[2]){
-                    situations.put(board.getBoard().toString(), new int[]{row, col, score});
-                }
-            }
-            return new int[]{row, col, score};
-        }
-
+    private void aiMoves(Board board) {     //gets the update board after every human move..
         char[][] b = board.getBoard();
-        for(int i = 0; i < board.getLength(); i++){
-            for(int j = 0; j < board.getLength(); j++){
+        for(int i = 0; i < b.length; i++){
+            for(int j = 0; j < b[0].length; j++){   //check all empty places and try them with supportAI
                 if(b[i][j] == '-'){
-                    b[i][j] = this.symbol;
-                    humanMove(board);
+                    Board board2 = board.clone();
+                    char[][] b2 = b.clone();
+                    b2 [i][j] = symbol;   //try the move
+                    board2.setBoard(b2);  //update the board with that move
+                    System.out.println("Ai's move");
+                    board2.printBoard();
+                    int conclusion = board2.hasConcluded(i, j, symbol);      //move's conclusion for base_case.
+                    System.out.println("conclusion: " + conclusion);
+                    if (conclusion != -1){
+                        if(map.containsKey(board.toString()) && map.get(board.toString())[2] < conclusion){
+                            map.put(board.toString(), new int[]{i, j, conclusion});    //for base case if the score stored is smaller update it.
+                            System.out.println("An end move by ai"+conclusion);
+                        }
+                        else{
+                            map.put(board.toString(), new int[]{i, j, conclusion});//if the record does not exist.
+                        }
+                        return;
+                    }
+                    System.out.println("Not an end move");
+                    humanMoves(board2.clone());      //ask for next human move.
                 }
             }
         }
-
-        return new int[]{0};
     }
 
-    private int[] humanMove(Board board){
+
+    private void humanMoves(Board board){           //gets board after every ai_move.
         char[][] b = board.getBoard();
-        for(int i = 0; i < board.getLength(); i++){
-            for(int j = 0; j < board.getLength(); j++){
+        for(int i = 0; i < b.length; i++){
+            for(int j = 0; j < b[0].length; j++){
                 if(b[i][j] == '-'){
-                    b[i][j] = this.symbol;
-                    aiMove(new Board(b), i, j, -3);
+                    char[][] b2 = b.clone();
+                    b2[i][j] = humanSymbol;      //update the '-' place
+                    Board board2 = board.clone();
+                    board2.setBoard(b);//update the board to send to AI for move.
+                    System.out.println("Human move: ");
+                    board2.printBoard();
+                    int conclusion = board2.hasConcluded(i, j, humanSymbol);
+                    System.out.println("conclusion: " + conclusion);
+                    if (conclusion != -1){
+                        if(conclusion == 1){
+                            conclusion = -3;//if human wins its -3 for AI...
+                        }
+                        if(map.containsKey(board.toString()) && map.get(board.toString())[2] < conclusion){
+                            map.put(board.toString(), new int[]{i, j, conclusion});
+                        }//if the new result is a draw for AI rather than a loss update it.
+                        else{
+                            map.put(board.toString(), new int[]{i, j, conclusion});
+                        }
+                        System.out.println("An end move by human"+conclusion);
+                        return;
+                    }
+                    aiMoves(board.clone());
+                    i --;
+                    j --;
                 }
             }
         }
-    }
-
-    private int reachedEnd(Board board, int row, int col){
-        return board.hasConcluded(row, col, this.symbol);
     }
 }

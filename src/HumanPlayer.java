@@ -5,17 +5,17 @@ public class HumanPlayer extends Player {
 
     public HumanPlayer(char symbol) {
         super(symbol);
+        this.symbol = symbol;
     }
 
     @Override
     public int[] getMove(Board board) {
+        System.out.println(symbol);
         Scanner scan = new Scanner(System.in);
         System.out.print("Enter the row position: ");
         int row = scan.nextInt();
-        System.out.println("Enter the column position: ");
+        System.out.print("Enter the column position: ");
         int col = scan.nextInt();
-        return new int[] {row, col};
+        return new int[] {row-1, col-1};
     }
-
-
 }
