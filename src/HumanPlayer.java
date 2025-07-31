@@ -16,6 +16,7 @@ public class HumanPlayer extends Player {
         int row = scan.nextInt();
         System.out.print("Enter the column position: ");
         int col = scan.nextInt();
+        System.out.println(symbol+"'s move");
         return new int[] {row-1, col-1};
     }
 }

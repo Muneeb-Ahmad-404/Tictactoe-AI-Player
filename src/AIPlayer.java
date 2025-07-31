@@ -1,90 +1,87 @@
 import java.util.HashMap;
 public class AIPlayer extends Player {
     private HashMap<String, int[]> map;  //int of the form row, col, score
-    private char humanSymbol;
+    private final char humanSymbol;
 
     public AIPlayer(char symbol) {
-        super(symbol);
-        if(symbol == 'O'){
-            humanSymbol = 'X';
-        }
-        else{
-            humanSymbol = 'O';
-        }
+        super('O');
+        humanSymbol = 'X';
         map = new HashMap<String, int[]>();
     }
+
     public int[] getMove(Board board) {
-        if(map.containsKey(board.toString())) {
+        System.out.println("AI's Move");
+        if (map.containsKey(board.toString())) {
             System.out.println("contains");
             return map.get(board.toString());
+        } else {
+            return minmaxMoves(board.clone(), symbol);
+        }
+    }
+
+    private int[] minmaxMoves(Board board, char mark) {
+        String key = board.toString();
+        if(map.containsKey(key)){ return map.get(key);}
+
+        //game end check
+        int conclusion = board.currentStatus();
+
+        if(conclusion != -1){
+            if(conclusion == 1) return new int[]{-1, -1, 1};
+            else if(conclusion == -3) return new int[]{-1, -1, -3};
+            else if(conclusion == 0) return new int[]{-1, -1, 0};
+        }
+
+
+        int bestScore;
+        int bestMoveRow = -1;
+        int bestMoveCol = -1;
+
+        if(mark == symbol){
+            bestScore = Integer.MIN_VALUE;
+            for(int i = 0; i < board.getLength(); i++) {
+                for(int j = 0; j < board.getLength(); j++) {
+                    if (board.getBoard()[i][j] == '-') {
+                        Board newBoard =  board.clone();
+                        newBoard.placeMove(i, j, mark);
+                        int[] recursiveResult = minmaxMoves(newBoard, humanSymbol);
+                        int score =  recursiveResult[2];
+                        if (bestScore < score){
+                            bestScore = score;
+                            bestMoveRow = i;
+                            bestMoveCol = j;
+                        }
+                    }
+                }
+            }
         }
         else{
-            aiMoves(board.clone());
-            return map.get(board.toString());
-        }
-    }
-    private void aiMoves(Board board) {     //gets the update board after every human move..
-        char[][] b = board.getBoard();
-        for(int i = 0; i < b.length; i++){
-            for(int j = 0; j < b[0].length; j++){   //check all empty places and try them with supportAI
-                if(b[i][j] == '-'){
-                    Board board2 = board.clone();
-                    char[][] b2 = b.clone();
-                    b2 [i][j] = symbol;   //try the move
-                    board2.setBoard(b2);  //update the board with that move
-                    System.out.println("Ai's move");
-                    board2.printBoard();
-                    int conclusion = board2.hasConcluded(i, j, symbol);      //move's conclusion for base_case.
-                    System.out.println("conclusion: " + conclusion);
-                    if (conclusion != -1){
-                        if(map.containsKey(board.toString()) && map.get(board.toString())[2] < conclusion){
-                            map.put(board.toString(), new int[]{i, j, conclusion});    //for base case if the score stored is smaller update it.
-                            System.out.println("An end move by ai"+conclusion);
+            bestScore = Integer.MAX_VALUE;
+            for(int i = 0; i < board.getLength(); i++) {
+                for(int j = 0; j < board.getLength(); j++) {
+                    if (board.getBoard()[i][j] == '-') {
+                        Board newBoard =  board.clone();
+                        newBoard.placeMove(i, j, mark);
+                        int[] recursiveResult = minmaxMoves(newBoard, symbol);
+                        int score =  recursiveResult[2];
+                        if (bestScore > score){
+                            bestScore = score;
+                            bestMoveRow = i;
+                            bestMoveCol = j;
                         }
-                        else{
-                            map.put(board.toString(), new int[]{i, j, conclusion});//if the record does not exist.
-                        }
-                        return;
                     }
-                    System.out.println("Not an end move");
-                    humanMoves(board2.clone());      //ask for next human move.
                 }
             }
         }
-    }
-
-
-    private void humanMoves(Board board){           //gets board after every ai_move.
-        char[][] b = board.getBoard();
-        for(int i = 0; i < b.length; i++){
-            for(int j = 0; j < b[0].length; j++){
-                if(b[i][j] == '-'){
-                    char[][] b2 = b.clone();
-                    b2[i][j] = humanSymbol;      //update the '-' place
-                    Board board2 = board.clone();
-                    board2.setBoard(b);//update the board to send to AI for move.
-                    System.out.println("Human move: ");
-                    board2.printBoard();
-                    int conclusion = board2.hasConcluded(i, j, humanSymbol);
-                    System.out.println("conclusion: " + conclusion);
-                    if (conclusion != -1){
-                        if(conclusion == 1){
-                            conclusion = -3;//if human wins its -3 for AI...
-                        }
-                        if(map.containsKey(board.toString()) && map.get(board.toString())[2] < conclusion){
-                            map.put(board.toString(), new int[]{i, j, conclusion});
-                        }//if the new result is a draw for AI rather than a loss update it.
-                        else{
-                            map.put(board.toString(), new int[]{i, j, conclusion});
-                        }
-                        System.out.println("An end move by human"+conclusion);
-                        return;
-                    }
-                    aiMoves(board.clone());
-                    i --;
-                    j --;
-                }
-            }
+        int[] finalResult = new int[]{bestMoveRow, bestMoveCol, bestScore};
+        if(!map.containsKey(key)){
+            map.put(key, finalResult);
         }
+        else if(map.containsKey(key) && map.get(key)[2]<bestScore){
+            map.put(key, finalResult);
+        }
+        return map.get(key);
     }
 }
+
+//          9 places
