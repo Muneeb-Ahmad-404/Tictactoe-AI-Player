@@ -1,3 +1,5 @@
+package Original;
+
 import java.util.HashMap;
 public class AIPlayer extends Player {
     private HashMap<String, int[]> map;  //int of the form row, col, score

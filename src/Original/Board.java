@@ -1,3 +1,5 @@
+package Original;
+
 import java.util.HashMap;
 
 public class Board implements Cloneable{
