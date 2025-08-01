@@ -44,6 +44,7 @@ public class AIPlayer2 extends Player2{
                             bestScore = result[2];
                             bestRow = row;
                             bestCol = col;
+                            if(bestRow == 100) break;
                         }
                     }
                     else{
@@ -51,6 +52,7 @@ public class AIPlayer2 extends Player2{
                             bestScore = result[2];
                             bestRow = row;
                             bestCol = col;
+                            if(bestScore == -100) break;
                         }
                     }
                     }
